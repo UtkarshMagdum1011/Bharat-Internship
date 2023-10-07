@@ -1,0 +1,46 @@
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+import weka.classifiers.trees.J48;
+import weka.classifiers.Evaluation;
+import weka.core.Attribute;
+import weka.core.FastVector;
+import weka.core.Instance;
+import java.util.Scanner;	
+
+public class TitanicClassification {
+    public static void main(String[] args) throws Exception {
+        DataSource source = new DataSource("titanic.arff");
+        Instances data = source.getDataSet();
+        data.setClassIndex(data.numAttributes() - 1);
+
+        J48 classifier = new J48();
+        classifier.buildClassifier(data);
+
+        FastVector attributes = new FastVector();
+        attributes.addElement(new Attribute("Pclass"));
+        attributes.addElement(new Attribute("Age"));
+        attributes.addElement(new Attribute("Gender"));
+
+        Instance newInstance = new Instance(3);
+        newInstance.setDataset(new Instances("TestInstance", attributes, 0));
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Pclass (1, 2, or 3): ");
+        double pclass = scanner.nextDouble();
+        System.out.print("Enter Age: ");
+        double age = scanner.nextDouble();
+        System.out.print("Enter Gender (0 for female, 1 for male): ");
+        double gender = scanner.nextDouble();
+
+        newInstance.setValue((Attribute) attributes.elementAt(0), pclass);
+        newInstance.setValue((Attribute) attributes.elementAt(1), age);
+        newInstance.setValue((Attribute) attributes.elementAt(2), gender);
+
+        double prediction = classifier.classifyInstance(newInstance);
+        String predictedClass = data.classAttribute().value((int) prediction);
+
+        System.out.println("Predicted survival status: " + predictedClass);
+
+        scanner.close();
+    }
+}
